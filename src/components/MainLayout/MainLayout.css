@@ -1,0 +1,22 @@
+.trigger {
+    padding: 10;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s;
+    width: 50px;
+    border-color:#1890ff ;
+    
+  }
+  
+   .trigger:hover {
+    color: #1890ff;
+  }
+
+   .site-layout-background {
+    background: #fff;
+  }
+  .nav-bar{
+    
+    box-shadow: 5px 10px 10px 18px red;
+    height: 50px;  
+  }
