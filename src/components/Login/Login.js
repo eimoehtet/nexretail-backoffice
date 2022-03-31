@@ -1,8 +1,18 @@
 import { Form, Input, Button, Checkbox, Row ,Col} from 'antd';
-import './login.css'
+import './login.css';
+import {useDispatch,useSelector} from 'react-redux'
+import { login } from '../../store/actions/Login/login';
+import { useNavigate } from 'react-router';
 const Login = () => {
-  const onFinish = (values) => {
-    console.log('Success:', values);
+  const dispatch=useDispatch();
+  const navigate=useNavigate();
+  const onFinish = async (values) => {
+    const username=values.username;
+    const password=values.password;
+    await dispatch(login(username,password));
+    console.log('Called Dispatch.') 
+    navigate('/')
+
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -30,7 +40,7 @@ const Login = () => {
                   <Form
                 className='form'
                 name="basic"
-
+          
             labelCol={{ span: 6 }}
             wrapperCol={{
             span: 24,

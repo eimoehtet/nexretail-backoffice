@@ -1,0 +1,7 @@
+.h1{
+    font-size: large;
+}
+.ant-table-thead > tr >th{
+    color: white;
+    background: #3071b9 !important;
+  }

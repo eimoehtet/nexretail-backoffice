@@ -7,8 +7,8 @@
     border-color:#1890ff ;
     
   }
-  
-   .trigger:hover {
+ 
+    .trigger:hover {
     color: #1890ff;
   }
 
@@ -16,7 +16,8 @@
     background: #fff;
   }
   .nav-bar{
-    
-    box-shadow: 5px 10px 10px 18px red;
-    height: 50px;  
+    background-color:#f0f2f5;
+    height: 50px;
+    z-index:15;
+    box-shadow: 0 2px 3px 3px #d1cdcd;
   }
