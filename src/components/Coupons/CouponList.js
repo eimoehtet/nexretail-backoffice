@@ -1,79 +1,89 @@
-import { Table, Tag, Space } from 'antd';
+import { Table, Space ,Breadcrumb,PageHeader,Button} from 'antd';
+import { useEffect, useState } from 'react';
+import { useSelector,useDispatch } from 'react-redux';
+import { getCoupons } from '../../store/actions/Coupon/couponActions';
+import { Link } from 'react-router-dom';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import EditCoupon from './EditCoupon';
+import DeleteCoupon from './DeleteCoupon';
+
 const CouponList = () => {
+  const dispatch=useDispatch();
+  const token=useSelector(state=>state.auth.token);
+  const [selectedIndex,setSelectedIndex] = useState(null);
+  const [isModalVisible,setIsModalVisible]=useState(false);
+  const [isConfirmVisible,setIsConfirmVisible]=useState(false);
+  useEffect(()=>{
+    dispatch(getCoupons(token))
+  },[])
 const columns = [
   {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: text => <a>{text}</a>,
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-  },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: tags => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
+    title: 'Amount',
+    dataIndex: 'amount',
+    key: 'amount',
   },
   {
     title: 'Action',
     key: 'action',
     render: (text, record) => (
       <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+        <a onClick={()=>{showEditModal(record)}}><EditOutlined/> Edit</a>
+        <DeleteCoupon id={selectedIndex?.id} onCancel={handleCancel} onOK={handleOK}>
+        <a style={{color:'red'}} onClick={()=>{showDeleteConfirm(record)}}><DeleteOutlined/> Delete</a>
+        </DeleteCoupon>
+        
       </Space>
     ),
   },
 ];
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+const showEditModal = (record) => {
+  setSelectedIndex(record);
+  setIsModalVisible(true);
+
+}
+const handleOK = () => {
+  setIsModalVisible(false);
+  setIsConfirmVisible(false);
+}
+
+const handleCancel = () => {
+  setIsModalVisible(false);
+  setIsConfirmVisible(false);
+}
+
+const showDeleteConfirm = (record) => {
+  setSelectedIndex(record);
+  setIsConfirmVisible(true);
+}
+  const coupons=useSelector(state=>state.coupons.coupons);
     return (
-        <Table columns={columns} dataSource={data} />
+        <>
+        <Breadcrumb>
+          <Breadcrumb.Item>
+            Coupons
+          </Breadcrumb.Item>
+        </Breadcrumb>
+        <PageHeader
+           
+          className="site-page-header"
+          extra={[
+           <Link to='/coupons/new'> <Button type="primary" >
+              Add New
+            </Button>
+            </Link>
+          ]}
+        />
+
+       
+        <Table columns={columns} dataSource={coupons} />
+        <EditCoupon id={selectedIndex?.id} amount={selectedIndex?.amount} visible={isModalVisible} onOK={handleOK} onCancel={handleCancel}/>
+        </>
     )
 }
 export default CouponList;

@@ -1,79 +1,93 @@
-import { Table, Tag, Space } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Table, Breadcrumb, Space, PageHeader, Button } from 'antd';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { getAllDiscounts } from '../../store/actions/Discount/discountActions';
+import DeleteDiscount from './DeleteDiscount';
+import EditDiscount from './EditDiscount';
 const DiscountList = () => {
+  const [selectedIndex,setSelectedIndex]=useState(null);
+  const token =useSelector(state=>state.auth.token);
+  const dispatch=useDispatch();
+  useEffect (()=>{
+    dispatch(getAllDiscounts(token));
+  },[])
+
 const columns = [
   {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: text => <a>{text}</a>,
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: 'Title',
+    dataIndex: 'title',
+    key: 'title',
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: 'Percentage',
+    dataIndex: 'percentage',
+    key: 'percentage',
   },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: tags => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
+ 
   {
     title: 'Action',
     key: 'action',
     render: (text, record) => (
       <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+        <a onClick={()=>{showModal(record)}}><EditOutlined/> Edit </a>
+        <DeleteDiscount id={selectedIndex?.id} onCancel={handleCancel} onOK={handleOk}>
+        <a style={{color:'red'}} onClick={()=>{showDeleteConfirm(record)}}><DeleteOutlined/> Delete</a>
+        </DeleteDiscount>
+       
       </Space>
     ),
   },
 ];
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+const [isModalVisible, setIsModalVisible] = useState(false);
+const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+
+  const showModal = (record) => {
+    setSelectedIndex(record)
+    setIsModalVisible(true);
+  };
+  const showDeleteConfirm = (record) => {
+    setSelectedIndex(record);
+    setIsConfirmVisible(true);
+  }
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    setIsConfirmVisible(false)
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setIsConfirmVisible(false)
+  };
+
+const discounts = useSelector(state=>state.discounts.discounts);
     return (
-        <Table columns={columns} dataSource={data} />
+      <>
+       <Breadcrumb>
+        <Breadcrumb.Item>Discounts</Breadcrumb.Item>
+
+        </Breadcrumb>
+      <PageHeader
+      className="site-page-header"
+      extra={[
+       <Link to='/discounts/new'> <Button type="primary" >
+          Add New
+        </Button>
+        </Link>
+      ]}
+        />
+      
+        <Table columns={columns} dataSource={discounts} />
+        <EditDiscount id={selectedIndex?.id} title={selectedIndex?.title} percentage={selectedIndex?.percentage} visible={isModalVisible} onOK={handleOk} onCancel={handleCancel}/>
+        </>
     )
 }
 export default DiscountList;

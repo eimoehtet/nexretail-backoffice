@@ -2,71 +2,42 @@ import { CREATE_UNIT_FAIL, CREATE_UNIT_START, CREATE_UNIT_SUCCESS, DELETE_UNIT_F
 
 const initialState={
     units:[],
-    unit:null,
-    error:null
+    unit:null
+    
 }
 const UnitReducer = (state=initialState,action) => {
     switch(action.type){
-        case GET_UNITS_START:
-            return{
-                units:[],
-                error:null
-            }
+       
         case GET_UNITS_SUCCESS:
             return{
+                
                 units:action.payload,
-                error:null
+                
             } 
-        case GET_UNITS_FAIL:
-            return{
-                units:[],
-                error:null
-            }
-        case CREATE_UNIT_START:
-            return {
-                unit:null,
-                error:null
-            }  
+        
+       
         case CREATE_UNIT_SUCCESS:
             return {
+                ...state.units,
                 unit:action.payload,
-                error:null
+             
             }
-        case CREATE_UNIT_FAIL:
-            return {
-                unit:null,
-                error:null
-            }  
-        case UPDATE_UNIT_START:
-            return {
-                unit:null,
-                error:null
-            } 
+       
+       
         case UPDATE_UNIT_SUCCESS: 
             return {
+                ...state.units,
                 unit:action.payload,
-                error:null
+                
             }
-        case UPDATE_UNIT_FAIL:
-            return {
-                unit:null,
-                error:action.payload
-            }  
-        case DELETE_UNIT_START:
-            return {
-                unit:null,
-                error:null
-            }   
+      
+      
         case DELETE_UNIT_SUCCESS:
             return {
+                ...state.units,
                 unit:action.payload,
-                error:null
-            } 
-        case DELETE_UNIT_FAIL:
-            return {
-                unit:null,
-                error:null
-            }                        
+                
+            }            
         default:
             return state;         
     }

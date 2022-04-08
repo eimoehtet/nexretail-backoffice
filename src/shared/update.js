@@ -1,1 +1,0 @@
-export const update=(oldState,newState)=>({...oldState,...newState})

@@ -5,11 +5,12 @@ import { getUnits, updateUnit } from "../../store/actions/Unit/unitActions";
 const EditUnit = (props) => {
     const dispatch=useDispatch();
     const token=useSelector(state=>state.auth.token);
-    const onFinish = (values) => {
+    const onFinish =async (values) => {
        const name=values.name;
-       dispatch(updateUnit(props.id,name,token));
-       dispatch(getUnits(token));
+      await dispatch(updateUnit(props.id,name,token));
        props.onOk();
+       dispatch(getUnits(token));
+      
       };
     return(
         <Modal title="Basic Modal" destroyOnClose={true} visible={props.visible}  onCancel={props.onCancel} footer={null}>

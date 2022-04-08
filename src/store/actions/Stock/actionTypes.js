@@ -1,0 +1,1 @@
+export const GET_INVENTORIES = "GET_INVENTORIES";

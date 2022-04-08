@@ -6,12 +6,12 @@ const EditCategory = (props) => {
     const dispatch=useDispatch();
     const token=useSelector(state=>state.auth.token);
 
-     const onFinish = (values) => {
+     const onFinish =async (values) => {
         const name=values.name;
-        console.log("name",name);
-         dispatch(updateCategory(name,token,props.id));
-         dispatch(getCategories(token));
+        await dispatch(updateCategory(name,token,props.id));
          props.onOk();
+         dispatch(getCategories(token));
+        
     }
     return(
         <Modal title="Edit Category" destroyOnClose visible={props.visible}  onCancel={props.onCancel} footer={null}>

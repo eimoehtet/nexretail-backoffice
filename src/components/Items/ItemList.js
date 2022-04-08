@@ -1,7 +1,11 @@
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Table,  Space ,Breadcrumb,PageHeader, Button} from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {useSelector,useDispatch} from 'react-redux';
-import { getItems } from '../../store/actions/Item/item';
+import { Link } from 'react-router-dom';
+import {getItems } from '../../store/actions/Item/itemActions';
+import DeleteItem from './DeleteItem';
+import EditItem from './EditItem';
 import './ItemList.css'
 const ItemList = () => {
 
@@ -58,20 +62,42 @@ const columns = [
     key: 'action',
     render: (text, record) => (
       <Space size="middle">
-        <a>Edit</a>
-        <a>Delete</a>
+        <a onClick={()=>{showEditModal(record)}}><EditOutlined/>Edit</a>
+        <DeleteItem handleCancel={handleCancel} handleOk={handleOk}>
+        <a style={{color:'red'}} onClick={()=>{showDelete(record)}}> <DeleteOutlined/>Delete</a>
+        </DeleteItem>
+        
       </Space>
     ),
   },
 ];
-
-  
   const token=useSelector(state=>state.auth.token);
   const dispatch=useDispatch();
   useEffect(()=>{
     dispatch(getItems(token));
   },[]);
   const items=useSelector(state=>state.items.items);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const [selectedItem,setSelectedItem] = useState(null);
+
+  const showEditModal = (record) => {
+    setSelectedItem(record);
+    setIsModalVisible(true);
+    
+  };
+  const showDelete = async(record) => {
+    setSelectedItem(record);
+    setIsConfirmVisible(true);
+  }
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
     return (
       <>
         <Breadcrumb>
@@ -80,12 +106,17 @@ const columns = [
             <PageHeader  
         className="site-page-header"
         extra={[
-          <Button type="primary">
-            Add New
+          <Button type="primary" >
+           <Link to='/items/new'>Add New</Link> 
           </Button>
         ]}
       />
         <Table columns={columns} dataSource={items} />
+        <EditItem id={selectedItem?.id} name={selectedItem?.name} description={selectedItem?.description}
+        categoryId={selectedItem?.category.id} unitId={selectedItem?.unit.id}
+        categoryName={selectedItem?.category.name} unitName={selectedItem?.unit.name} sku={selectedItem?.sku}
+        unitPrice={selectedItem?.unitPrice} buyingPrice={selectedItem?.buyingPrice}
+         visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}/>
         </>
     )
 }

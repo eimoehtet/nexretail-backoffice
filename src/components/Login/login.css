@@ -8,7 +8,6 @@
     font-size: 20px;
     line-height: 1.625rem;
     text-align: center;
-    margin:40px 0 20px;
     padding-top: 20px;
 }
 
@@ -16,13 +15,17 @@
     min-height: 300px;
     padding: 30px;
 }
-.div{
-    width: 100%;
-    height: 50px;
-    background-color: black;
-}
-.h2{
-    padding-top: 5px;
+.header{
+    padding-top: 15px;
     text-align: center;
+    height: 60px;
+    text-align: center;
+    background-color: black;
     color: white;
+}
+.setting {
+  float:right;
+  padding-top: 2px;
+  padding-right:40px;
+ 
 }

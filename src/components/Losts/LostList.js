@@ -1,79 +1,110 @@
-import { Table, Tag, Space } from 'antd';
+import { Table,Space, Breadcrumb, PageHeader, Button,Select ,DatePicker} from 'antd';
+import { useEffect, useState } from 'react';
+import { useDispatch,useSelector } from 'react-redux';
+import { getLosts, getLostsByIdBetweenDate } from '../../store/actions/Lost/lostActions';
+import DeleteLost from './DeleteLost';
+import { DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import { getInstance } from 'antd/lib/message';
+import { getItems } from '../../store/actions/Item/itemActions';
+const {RangePicker} = DatePicker;
+const {Option} = Select;
 const LostList = () => {
+  const token = useSelector(state=>state.auth.token);
+  const dispatch=useDispatch();
+  const [selectedRecord,setSelectedRecord] = useState(null);
+  const [isConfirmVisible,setIsConfirmVisible]=useState(false);
+  const [selectedItem,setSelectedItem] = useState(null);
+  const [selectedDate,setSelectedDate]=useState(null);
+  useEffect(()=>{
+    dispatch(getLosts(token));
+    dispatch(getItems(token))
+  },[])
 const columns = [
   {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: text => <a>{text}</a>,
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: 'Item',
+    dataIndex: ['item','name'],
+    key: 'item',
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: 'Quantity',
+    dataIndex: 'quantity',
+    key: 'quantity',
   },
   {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: tags => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
+    title: 'Date',
+    key: 'date',
+    dataIndex: 'date',
   },
   {
     title: 'Action',
     key: 'action',
     render: (text, record) => (
       <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+        <DeleteLost id={selectedRecord?.id} handleOK={handleOK} handleCancel={handleCancel}>
+        <a style={{color:'red'}} onClick={()=>{
+          showDeleteConfirm(record)
+        }}><DeleteOutlined/> Delete</a>
+        </DeleteLost>
       </Space>
     ),
   },
 ];
+const losts = useSelector(state=>state.losts.losts)
+const items = useSelector (state=>state.items.items)
+const handleOK = () => {
+  setIsConfirmVisible(false)
+}
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+const handleCancel = () => {
+  setIsConfirmVisible(false)
+}
+
+const showDeleteConfirm = (record) => {
+  setSelectedRecord(record)
+}
+const onChangeItem = (item) => {
+  setSelectedItem(item)
+}
+const onChangeDate = (moments,dateString) =>{
+  setSelectedDate([moments[0].format('YYYY-MM-DDTHH:mm:ss[Z]'),moments[1].format('YYYY-MM-DDTHH:mm:ss[Z]')]);
+}
+const onSearchLosts = () => {
+  const itemId=selectedItem;
+  const startDate=selectedDate[0];
+  const endDate=selectedDate[1];
+  const data={itemId,startDate,endDate};
+  console.log(data)
+  dispatch(getLostsByIdBetweenDate(data,token));
+}
     return (
-        <Table columns={columns} dataSource={data} />
+        <>
+        <Breadcrumb>
+        <Breadcrumb.Item>Losts</Breadcrumb.Item>
+        </Breadcrumb>
+        <PageHeader
+        className='site-page-header'
+        extra={[
+          <div style={{paddingRight:300}}>
+            <Select placeholder = "select item" onChange={onChangeItem} style={{width:'200px'}}>
+              {items.map((item)=>(
+                 <Option value={item.id}>{item.name}</Option>
+              ))}
+               
+            </Select>,
+            <RangePicker onChange={onChangeDate}/>,
+            <Button type='primary' htmlType='submit' onClick={onSearchLosts}>Load</Button>
+          </div>,
+         <Link to='/inventory/losts/new'><Button type='primary'><PlusCircleOutlined/>Add New</Button></Link>
+        ]}
+        />
+        <Table columns={columns} dataSource={losts} />
+        </>
     )
 }
 export default LostList;

@@ -2,9 +2,10 @@ import { Table, Button,PageHeader,Breadcrumb, Space } from 'antd';
 import { Link } from 'react-router-dom';
 import { useEffect,useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteCategory, getCategories } from '../../store/actions/Category/categoryActions';
+import {getCategories } from '../../store/actions/Category/categoryActions';
 import EditCategory from './EditCategory';
-import { DeleteFilled, DeleteOutlined, EditFilled, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined,  EditOutlined } from '@ant-design/icons';
+import DeleteCategory from './DeleteCategory';
 const CategoryList = () => {
 
 const columns = [
@@ -25,7 +26,10 @@ const columns = [
       <Space size="middle">
         
         <a onClick={()=>{showEditModal(record)}}><EditOutlined/>Edit</a>
+        <DeleteCategory id={selectedCategory?.id} handleOk={handleOk} handleCancel={handleCancel} >
         <a style={{color:'red'}} onClick={()=>{deletecategory(record)}}><DeleteOutlined/>Delete</a>
+        </DeleteCategory>
+        
       </Space>
     ),
   },
@@ -40,25 +44,26 @@ useEffect(()=>{
 const categories=useSelector(state=>state.categories.categories);
 
 const [isModalVisible, setIsModalVisible] = useState(false);
+const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 const [selectedCategory,setSelectedCategory]=useState(null);
 
 const showEditModal = (record) => {
-  console.log("record",record);
   setSelectedCategory(record);
   setIsModalVisible(true);
 };
-const deletecategory = (record) => {
+const deletecategory =(record) => {
   setSelectedCategory(record);
-  dispatch(deleteCategory(token,record.id));
-  dispatch(getCategories(token));
+ setIsConfirmVisible(true);
 }
 
 const handleOk = () => {
   setIsModalVisible(false);
+  setIsConfirmVisible(false);
 };
 
 const handleCancel = () => {
   setIsModalVisible(false);
+  setIsConfirmVisible(false);
 };
     return (
       <>

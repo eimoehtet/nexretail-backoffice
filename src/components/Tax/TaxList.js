@@ -1,79 +1,83 @@
-import { Table, Tag, Space } from 'antd';
+import { DeleteOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Table,Space, Breadcrumb, PageHeader, Button } from 'antd';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { getTaxes } from '../../store/actions/Tax/taxActions';
+import DeleteTax from './DeleteTax';
+import EditTax from './EditTax';
 const TaxList = () => {
+  const token = useSelector(state=>state.auth.token);
+  const dispatch = useDispatch();
+  const [isModalVisible,setIsModalVisible] = useState(false);
+  const [isConfirmVisible,setIsConfirmVisible]=useState(false);
+  const [selectedIndex,setSelectedIndex] = useState(null);
+  useEffect(()=>{
+    dispatch(getTaxes(token))
+  },[])
+
 const columns = [
+  {
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
+  },
   {
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
-    render: text => <a>{text}</a>,
+    
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-  },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: tags => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
+    title: 'Percent',
+    dataIndex: 'percentage',
+    key: 'percentage',
   },
   {
     title: 'Action',
     key: 'action',
     render: (text, record) => (
       <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+        <a onClick={()=>{showEditModal(record)}}><EditOutlined/> Edit</a>
+        <DeleteTax id={selectedIndex?.id} onCancel={handleCancel} onOk={handleOk}>
+        <a style={{color : 'red'}} onClick={()=>{showDeleteConfirm(record)}}><DeleteOutlined/>Delete</a>
+        </DeleteTax>
+        
       </Space>
     ),
   },
 ];
+const showDeleteConfirm = (record) => {
+setSelectedIndex(record);
+setIsConfirmVisible(true);
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+}
+const showEditModal = (record) => {
+  setSelectedIndex(record);
+  setIsModalVisible(true);
+}
+const handleCancel = () => {
+  setIsModalVisible(false);
+  setIsConfirmVisible(false)
+}
+const handleOk = () => {
+  setIsModalVisible(false);
+  setIsConfirmVisible(false);
+}
+    const taxes = useSelector(state=>state.taxes.taxes);
     return (
-        <Table columns={columns} dataSource={data} />
+        <>
+        <Breadcrumb>
+        <Breadcrumb.Item>Taxes</Breadcrumb.Item>
+        </Breadcrumb>
+        <PageHeader 
+        extra={[
+       <Link to='/setting/taxes/new'><Button type='primary' htmlType='submit'><PlusCircleOutlined/> Add New</Button></Link> 
+        ]}
+        />
+        <Table columns={columns} dataSource={taxes}  />
+        <EditTax id={selectedIndex?.id} name={selectedIndex?.name} percentage={selectedIndex?.percentage} isVisible={isModalVisible} onCancel={handleCancel} onOk={handleOk}/>
+        </>
     )
 }
 export default TaxList;

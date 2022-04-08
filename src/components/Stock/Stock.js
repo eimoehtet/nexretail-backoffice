@@ -1,79 +1,64 @@
 import { Table, Tag, Space } from 'antd';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getInventories } from '../../store/actions/Stock/inventoryActions';
+import './Stock.css'
 const Stock = () => {
+  const token=useSelector(state=>state.auth.token);
+  const dispatch = useDispatch();
+  useEffect(()=>{
+    dispatch(getInventories(token))
+  },[])
 const columns = [
   {
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
+  },
+  {
     title: 'Name',
-    dataIndex: 'name',
+    dataIndex:'name',
     key: 'name',
-    render: text => <a>{text}</a>,
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: 'Stock',
+    dataIndex: ['inventory','quantity'],
+    key: 'stock',
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: 'Inventory Cost',
+    dataIndex: ['inventory','inventoryCost'],
+    key: 'inventoryCost',
   },
   {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: tags => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: 'Action',
-    key: 'action',
-    render: (text, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
+    title: 'Retail Value',
+    dataIndex: ['inventory','retailValue'],
+    key:'retailValue'
+    
+  }
 ];
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
-    return (
-        <Table columns={columns} dataSource={data} />
+  const items = useSelector(state=>state.inventory.inventories);
+  
+  const inventories=items.map((inventory)=>(
+    inventory.inventory
+  ));
+
+  const inventoryCostTotal = inventories.map(cost=>cost.inventoryCost).reduce((prev, curr) => prev + curr, 0);
+
+  const retailTotal = inventories.map(retail=>retail.retailValue).reduce((prev, curr) => prev + curr, 0);
+  
+  return (
+        <>
+        <Table columns={columns} dataSource={items} pagination={false}/>
+        <div className='total'><span style={{paddingRight:40}}>Total=</span>
+        
+        <span style={{padding:200}}>{inventoryCostTotal}</span> 
+        <span style={{paddingLeft:30}}>{retailTotal}</span>
+        </div>
+         
+       
+        </>
     )
 }
 export default Stock;

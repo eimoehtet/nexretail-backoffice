@@ -1,16 +1,19 @@
 import { Form, Input, Button, Checkbox, Row ,Col} from 'antd';
 import './login.css';
-import {useDispatch,useSelector} from 'react-redux'
+import {useDispatch} from 'react-redux'
 import { login } from '../../store/actions/Login/login';
 import { useNavigate } from 'react-router';
+import { SettingOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import ChangeServerModal from './ChangeServerModal';
 const Login = () => {
   const dispatch=useDispatch();
   const navigate=useNavigate();
+  const [isModalVisible,setIsModalVisible]=useState(false);
   const onFinish = async (values) => {
     const username=values.username;
     const password=values.password;
     await dispatch(login(username,password));
-    console.log('Called Dispatch.') 
     navigate('/')
 
   };
@@ -18,10 +21,22 @@ const Login = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+  
+ const handleOk = () => {
+  setIsModalVisible(false);
+};
 
+const handleCancel = () => {
+  setIsModalVisible(false);
+};
+const changeServerIP = () =>{
+  setIsModalVisible(true);
+}
   return (
       <div className='main' style={{height:'100vh'}}>
-    <div className='div'><h2 className='h2'>Nex Retail Backoffice Manager</h2></div>
+    <div className='header'>
+      <span style={{fontSize:22,paddingLeft:50}}>Nex Retail Backoffice Manager</span> <SettingOutlined className='setting' style={{fontSize:24}} onClick={changeServerIP} />
+      </div>
       <Row justify='center' className='form-container'>
              <Col
                sm={18}
@@ -106,6 +121,7 @@ const Login = () => {
               </Col>
          
       </Row>
+      <ChangeServerModal visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}/>
       </div>
   );
 };

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { deleteUnit, getUnits } from '../../store/actions/Unit/unitActions';
+import DeleteUnit from './DeleteUnit';
 import EditUnit from './EditUnit';
 import './Unit.css';
 const UnitList = () => {
@@ -23,11 +24,17 @@ const columns = [
     title: 'Action',
     key: 'action',
     render: (text, record) => (
+      
       <Space size="middle">
         <a onClick={()=>{showEditModal(record)}}><EditOutlined/>Edit</a>
-        <a onClick={()=>{deleteUnitMethod(record)}}><DeleteOutlined/>Delete</a>
+       
+        <DeleteUnit id={selectedUnit?.id} handleCancel={handleCancel} handleOk={handleOk}>
+        <a onClick={()=>{deleteUnitMethod(record)} } style={{color:'red'}}><DeleteOutlined />Delete
+       </a>
+        </DeleteUnit>
       </Space>
     ),
+    
   },
 ];
 const dispatch=useDispatch();
@@ -37,14 +44,17 @@ useEffect(()=>{
 },[])
 const units=useSelector(state=>state.units.units);
 const [isModalVisible, setIsModalVisible] = useState(false);
-const [selectedUnit,setSelectedUnit]=useState(null);
+const [selectedUnit,setSelectedUnit]=useState(null);  
+const [isPopConfirmvisible, setIsPopConfirmVisible] =useState(false);
  
  const handleOk = () => {
     setIsModalVisible(false);
+    setIsPopConfirmVisible(false)
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setIsPopConfirmVisible(false)
   };
   const showEditModal = (record)=> {
     setSelectedUnit(record);
@@ -52,8 +62,8 @@ const [selectedUnit,setSelectedUnit]=useState(null);
   }
   const deleteUnitMethod = (record) =>{
     setSelectedUnit(record);
-    dispatch(deleteUnit(record.id,token));
-    dispatch(getUnits(token));
+    setIsPopConfirmVisible(true);
+    
   }
     return (
         <>
@@ -69,8 +79,11 @@ const [selectedUnit,setSelectedUnit]=useState(null);
           </Link>
         ]}
       />
-        <Table columns={columns} dataSource={units} />
+      
+        <Table columns={columns} dataSource={units}   />
+        
         <EditUnit id={selectedUnit?.id} name={selectedUnit?.name} visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}/>
+        
         </>
     )
 }

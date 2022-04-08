@@ -58,7 +58,7 @@ const MainLayout = () => {
             <SubMenu key='sub4' title="Inventory" icon={<BankOutlined/>}>
             <Menu.Item key='11'><Link to='inventory/stocks'>Stock</Link></Menu.Item>
             <Menu.Item key='12'><Link to='inventory/damages'>Damage</Link></Menu.Item>
-            <Menu.Item key='13'><Link to='/losts'>Losts</Link></Menu.Item>
+            <Menu.Item key='13'><Link to='inventory/losts'>Losts</Link></Menu.Item>
             </SubMenu>
             <Menu.Item key="14" icon={<DatabaseOutlined />}>
              <Link to='/registers'>Registers</Link> 

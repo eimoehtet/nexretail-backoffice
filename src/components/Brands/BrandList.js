@@ -1,79 +1,84 @@
-import { Table, Tag, Space } from 'antd';
+import { Table, Space, PageHeader,Breadcrumb,Button, Tooltip } from 'antd';
+import {DeleteOutlined, EditOutlined, PropertySafetyFilled} from '@ant-design/icons'
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { deleteBrand, getBrandsList } from '../../store/actions/Brand/brandActions';
+import EditBrand from './EditBrand';
+import DeleteBrand from './DeleteBrand';
+
 const BrandList = () => {
+const [selectedBrand,setSelectedBrand] = useState(null);
+const token=useSelector(state=>state.auth.token);
+const dispatch=useDispatch();
+useEffect(()=>{
+dispatch(getBrandsList(token));
+},[])  
 const columns = [
+  {
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
+  },
   {
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
-    render: text => <a>{text}</a>,
   },
-  {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-  },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: tags => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
+ 
+ 
   {
     title: 'Action',
     key: 'action',
     render: (text, record) => (
       <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+        <a onClick={()=>{showEditBrandModal(record)}}><EditOutlined />Edit</a>
+        <DeleteBrand id={selectedBrand?.id} handleCancel={handleCancel} handleOk={handleOk}>
+        <a onClick={()=>{deleteBrandHandler(record)} } style={{color:'red'}}><DeleteOutlined />Delete
+       </a>
+        </DeleteBrand>
       </Space>
     ),
   },
 ];
+const handleOk = () => {
+  setIsModalVisible(false);
+};
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+const handleCancel = () => {
+  setIsModalVisible(false);
+};
+const [isModalVisible,setIsModalVisible]=useState(false);
+const [isPopConfirmvisible, setIsPopConfirmVisible] =useState(false);
+const showEditBrandModal = (record) => {
+setSelectedBrand(record);
+setIsModalVisible(true);
+}
+
+const deleteBrandHandler = async(record) => {
+  setSelectedBrand(record);
+  setIsPopConfirmVisible(true);
+ 
+}
+const brands = useSelector(state=>state.brands.brands);
     return (
-        <Table columns={columns} dataSource={data} />
+        <>
+          <Breadcrumb>
+        <Breadcrumb.Item>Brands</Breadcrumb.Item>
+        </Breadcrumb>
+        <PageHeader
+         className="site-page-header"
+         extra={[
+          <Link to='/brands/new'> <Button type="primary" >
+             Add New
+           </Button>
+           </Link>
+         ]}
+        />
+
+        <Table columns={columns} dataSource={brands} />
+       <EditBrand id={selectedBrand?.id} name={selectedBrand?.name} visible={isModalVisible} onOK={handleOk} onCancel={handleCancel}/>
+        </>
     )
 }
 export default BrandList;

@@ -1,79 +1,64 @@
-import { Table, Tag, Space } from 'antd';
+import { Table, Button, Breadcrumb, PageHeader,Space } from 'antd';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getPurchases } from '../../store/actions/Purchase/purchaseActions';
+import { Link } from 'react-router-dom';
+import { EyeOutlined } from '@ant-design/icons';
 const PurchaseList = () => {
+  const token= useSelector (state=>state.auth.token);
+  const dispatch=useDispatch();
+  useEffect(()=> {
+    dispatch(getPurchases(token))
+  },[]);
 const columns = [
   {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: text => <a>{text}</a>,
+    title: 'Date',
+    dataIndex: 'purchaseTime',
+    key: 'date',
+
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: 'User',
+    dataIndex: ['user','name'],
+    key: 'user',
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: 'Supplier',
+    dataIndex: ['supplier','name'],
+    key: 'supplier',
   },
   {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: tags => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
+    title: 'Total',
+    key: 'total',
+    dataIndex: 'total',
   },
   {
-    title: 'Action',
-    key: 'action',
+    title: 'Detail',
+    key: 'detail',
     render: (text, record) => (
       <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+        <a><Link to={'/purchases/details/'+record.id}><EyeOutlined/></Link></a>
+        
       </Space>
     ),
   },
 ];
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+  const purchases = useSelector(state=>state.purchases.purchases);
+  
     return (
-        <Table columns={columns} dataSource={data} />
+        <>
+        <Breadcrumb>
+        <Breadcrumb.Item>Purchases</Breadcrumb.Item>
+        </Breadcrumb>
+        <PageHeader
+        className='site-page-header'
+        extra={[
+         <Link to='/purchases/new'> <Button type='primary'>Add New</Button></Link>
+        ]}
+        />
+        <Table columns={columns} dataSource={purchases} />
+        </>
     )
 }
 export default PurchaseList;
